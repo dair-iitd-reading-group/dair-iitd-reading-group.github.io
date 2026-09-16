@@ -1,3 +1,24 @@
-
-
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>DAIR IITD Reading Group</title> <meta name="description" content="DAIR IITD Reading Group — discussions on research topics, ideas, and concepts in AI." > <link rel="preconnect" href="https://fonts.googleapis.com"> <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500,8..60,600&display=swap" rel="stylesheet" > <link rel="stylesheet" href="style.css"> </head> <body> <header class="site-header"> <div class="container header-inner"> <div> <h1>DAIR IITD Reading Group</h1> <p class="subtitle"> Data Analytics and Intelligence Research Group, IIT Delhi </p> <p class="description"> We discuss <strong>research topics, ideas, and concepts</strong> across AI and related areas, rather than focusing on individual research papers. Each session is an opportunity to explore a topic, share perspectives, and discuss recent developments and foundational ideas. </p> </div> <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" > <span id="theme-icon">☾</span> </button> </div> </header> <main class="container"> <section class="sessions-section"> <div class="section-heading"> <h2>Reading Sessions</h2> <span id="status" class="status">Loading…</span> </div> <div class="table-wrapper"> <table> <thead> <tr> <th>Date</th> <th>Topic</th> <th>Presenter</th> <th>Slides</th> </tr> </thead> <tbody id="sessions"> <tr> <td colspan="4" class="loading"> Loading reading sessions… </td> </tr> </tbody> </table> </div> </section> </main> <footer class="site-footer"> <div class="container"> <p> DAIR IITD · Reading Group </p> </div> </footer> <script src="script.js"></script> </body> </html>
+<!DOCTYPE html> 
+  <html lang="en"> 
+    <head> 
+    <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>DAIR IITD Reading Group</title> 
+    <meta name="description" content="DAIR IITD Reading Group — discussions on research topics, ideas, and concepts in AI." > 
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500,8..60,600&display=swap" rel="stylesheet" > <link rel="stylesheet" href="style.css"> </head> <body> <!-- Header --> 
+      <header class="site-header"> 
+        <div class="container header-inner"> <div> 
+          <h1> DAIR IITD Reading Group </h1> 
+          <p class="subtitle"> Data Analytics and Intelligence Research Group, IIT Delhi </p> 
+          <p class="description"> We discuss <strong>research topics, ideas, and concepts</strong> across AI and related areas. Each session is an opportunity to explore a topic, share perspectives, and discuss recent developments and foundational ideas. </p> </div> 
+          <!-- Dark mode button --> 
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode" > <span id="theme-icon">☾</span> </button> 
+        </div> </header>
+         <!-- Main content --> 
+         <main class="container">
+           <section class="sessions-section"> <div class="section-heading">
+             <h2> Reading Sessions </h2> <span id="status" class="status" > Loading… </span> 
+            </div> <div class="table-wrapper"> <table> <thead> <tr> <th>Date</th> <th>Topic</th> <th>Presenter</th> <th>Slides</th> </tr> </thead> <tbody id="sessions"> <tr> 
+              <td colspan="4" class="loading" > Loading reading sessions… </td> </tr> </tbody> </table> </div> </section> </main> <!-- Footer --> <footer class="site-footer">
+       <div class="container"> <p> DAIR IITD · Reading Group </p> </div> </footer> <script src="script.js"></script> </body> </html>
