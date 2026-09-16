@@ -179,7 +179,7 @@ function render(rows) {
         if (Number.isNaN(da)) return 1;
         if (Number.isNaN(db)) return -1;
 
-        return da - db;
+        return db - da;
     });
 
 
