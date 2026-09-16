@@ -1,4 +1,3 @@
-
 const SHEET_ID = "1S2yiTEmyVC55bc6TR1dk7TN_mJ_QTyvUxwbNhSqWBN4";
 
 // The first tab of the Google Sheet is used.
@@ -132,11 +131,7 @@ function render(rows) {
 
     if (rows.length <= 1) {
         sessionsEl.innerHTML = `
-            <tr>
-                <td colspan="4" class="empty">
-                    No sessions have been added yet.
-                </td>
-            </tr>
+            <p class="empty">No sessions have been added yet.</p>
         `;
 
         statusEl.textContent = "";
@@ -189,8 +184,17 @@ function render(rows) {
 
 
     /* --------------------------------------------------
-       Create table rows
+       Create session rows
     -------------------------------------------------- */
+
+    if (sessions.length === 0) {
+        sessionsEl.innerHTML = `
+            <p class="empty">No sessions have been added yet.</p>
+        `;
+
+        statusEl.textContent = "";
+        return;
+    }
 
     sessionsEl.innerHTML = sessions.map(session => {
 
@@ -201,7 +205,7 @@ function render(rows) {
         /*
          * Presenter:
          *
-         * The PRESENTer's NAME itself becomes the link
+         * The presenter's name itself becomes the link
          * to their personal website.
          */
         const presenterHtml = presenterUrl
@@ -212,15 +216,11 @@ function render(rows) {
                     href="${escapeHtml(presenterUrl)}"
                     target="_blank"
                     rel="noopener noreferrer"
-                >
-                    ${escapeHtml(session.presenter)}
-                </a>
+                >${escapeHtml(session.presenter)}</a>
               `
 
             : `
-                <span class="presenter">
-                    ${escapeHtml(session.presenter)}
-                </span>
+                <span class="presenter">${escapeHtml(session.presenter)}</span>
               `;
 
 
@@ -238,41 +238,23 @@ function render(rows) {
                     href="${escapeHtml(slidesUrl)}"
                     target="_blank"
                     rel="noopener noreferrer"
-                >
-                    Slides
-                </a>
+                >Slides</a>
               `
 
             : `<span class="slides unavailable">—</span>`;
 
 
         return `
-            <tr>
+            <div class="session">
+                <time class="date">${escapeHtml(formatDate(session.date))}</time>
 
-                <td>
-                    <time class="date">
-                        ${escapeHtml(formatDate(session.date))}
-                    </time>
-                </td>
+                <div>
+                    <p class="topic">${escapeHtml(session.topic || "Untitled session")}</p>
+                    <p class="meta">${presenterHtml}</p>
+                </div>
 
-
-                <td>
-                    <span class="topic">
-                        ${escapeHtml(session.topic || "Untitled session")}
-                    </span>
-                </td>
-
-
-                <td>
-                    ${presenterHtml}
-                </td>
-
-
-                <td>
-                    ${slidesHtml}
-                </td>
-
-            </tr>
+                ${slidesHtml}
+            </div>
         `;
 
     }).join("");
@@ -318,12 +300,9 @@ async function loadSessions() {
         statusEl.textContent = "Unable to load";
 
         sessionsEl.innerHTML = `
-            <tr>
-                <td colspan="4" class="error">
-                    Unable to load reading sessions.
-                    Please try again later.
-                </td>
-            </tr>
+            <div class="error">
+                Unable to load reading sessions. Please try again later.
+            </div>
         `;
     }
 }
@@ -395,4 +374,3 @@ themeToggle.addEventListener(
 -------------------------------------------------- */
 
 loadSessions();
-
