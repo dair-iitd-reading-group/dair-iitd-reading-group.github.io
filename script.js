@@ -86,6 +86,23 @@ function normalizeHeader(value) {
 }
 
 
+function parseSessionDate(value) {
+    const raw = String(value || "").trim();
+
+    if (!raw) {
+        return null;
+    }
+
+    // Strip ordinal suffixes ("20th", "1st", "2nd", "3rd") which
+    // the native Date parser can't handle on its own.
+    const cleaned = raw.replace(/\b(\d{1,2})(st|nd|rd|th)\b/i, "$1");
+
+    const date = new Date(cleaned);
+
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+
 function formatDate(value) {
     const raw = String(value || "").trim();
 
@@ -93,9 +110,9 @@ function formatDate(value) {
         return "";
     }
 
-    const date = new Date(raw);
+    const date = parseSessionDate(raw);
 
-    if (!Number.isNaN(date.getTime())) {
+    if (date) {
         return new Intl.DateTimeFormat(undefined, {
             day: "2-digit",
             month: "short",
@@ -143,14 +160,35 @@ function render(rows) {
     const headers = rows[0].map(normalizeHeader);
 
 
+    // Find a column by trying several likely header names,
+    // then falling back to any header that contains the first candidate.
+    function findColumn(...candidates) {
+        for (const candidate of candidates) {
+            const idx = headers.indexOf(candidate);
+            if (idx !== -1) {
+                return idx;
+            }
+        }
+
+        return headers.findIndex(h => h.includes(candidates[0]));
+    }
+
+
     const index = {
-        date: headers.indexOf("date"),
-        topic: headers.indexOf("topic"),
-        description: headers.indexOf("topic description"),
-        presenter: headers.indexOf("presenter"),
-        website: headers.indexOf("presenter website"),
-        slides: headers.indexOf("slide link")
+        date: findColumn("date"),
+        topic: findColumn("topic"),
+        description: findColumn("topic description", "topic discription", "description", "discription", "topic desc", "details"),
+        presenter: findColumn("presenter"),
+        website: findColumn("presenter website", "website"),
+        slides: findColumn("slide link", "slides")
     };
+
+    if (index.description === -1) {
+        console.warn(
+            "Reading group sheet: couldn't find a 'Topic Description' column. Headers found:",
+            headers
+        );
+    }
 
 
     // Convert spreadsheet rows into session objects.
@@ -172,16 +210,18 @@ function render(rows) {
         );
 
 
-    // Sort sessions chronologically.
+    // Sort sessions by date, most recent first.
+    // Sessions with an unparseable date are pushed to the bottom.
     sessions.sort((a, b) => {
 
-        const da = new Date(a.date).getTime();
-        const db = new Date(b.date).getTime();
+        const da = parseSessionDate(a.date);
+        const db = parseSessionDate(b.date);
 
-        if (Number.isNaN(da)) return 1;
-        if (Number.isNaN(db)) return -1;
+        if (!da && !db) return 0;
+        if (!da) return 1;
+        if (!db) return -1;
 
-        return da - db;
+        return db.getTime() - da.getTime();
     });
 
 
