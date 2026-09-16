@@ -170,17 +170,23 @@ function render(rows) {
         );
 
 
-    // Sort sessions chronologically.
-    sessions.sort((a, b) => {
-
-        const da = new Date(a.date).getTime();
-        const db = new Date(b.date).getTime();
-
-        if (Number.isNaN(da)) return 1;
-        if (Number.isNaN(db)) return -1;
-
-        return db - da;
-    });
+        sessions.sort((a, b) => {
+          const parseDate = (dateString) => {
+              const cleaned = dateString.replace(
+                  /(\d+)(st|nd|rd|th)/,
+                  "$1"
+              );
+              return new Date(cleaned).getTime();
+          };
+      
+          const da = parseDate(a.date);
+          const db = parseDate(b.date);
+      
+          if (Number.isNaN(da)) return 1;
+          if (Number.isNaN(db)) return -1;
+      
+          return db - da;
+      });
 
 
     /* --------------------------------------------------
