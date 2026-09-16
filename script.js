@@ -146,6 +146,7 @@ function render(rows) {
     const index = {
         date: headers.indexOf("date"),
         topic: headers.indexOf("topic"),
+        description: headers.indexOf("topic description"),
         presenter: headers.indexOf("presenter"),
         website: headers.indexOf("presenter website"),
         slides: headers.indexOf("slide link")
@@ -158,6 +159,7 @@ function render(rows) {
         .map(row => ({
             date: row[index.date] || "",
             topic: row[index.topic] || "",
+            description: row[index.description] || "",
             presenter: row[index.presenter] || "",
             website: row[index.website] || "",
             slides: row[index.slides] || ""
@@ -170,23 +172,17 @@ function render(rows) {
         );
 
 
-        sessions.sort((a, b) => {
-          const parseDate = (dateString) => {
-              const cleaned = dateString.replace(
-                  /(\d+)(st|nd|rd|th)/,
-                  "$1"
-              );
-              return new Date(cleaned).getTime();
-          };
-      
-          const da = parseDate(a.date);
-          const db = parseDate(b.date);
-      
-          if (Number.isNaN(da)) return 1;
-          if (Number.isNaN(db)) return -1;
-      
-          return db - da;
-      });
+    // Sort sessions chronologically.
+    sessions.sort((a, b) => {
+
+        const da = new Date(a.date).getTime();
+        const db = new Date(b.date).getTime();
+
+        if (Number.isNaN(da)) return 1;
+        if (Number.isNaN(db)) return -1;
+
+        return da - db;
+    });
 
 
     /* --------------------------------------------------
@@ -202,17 +198,20 @@ function render(rows) {
         return;
     }
 
-    sessionsEl.innerHTML = sessions.map(session => {
+    sessionsEl.innerHTML = sessions.map((session, i) => {
 
         const presenterUrl = validUrl(session.website);
         const slidesUrl = validUrl(session.slides);
+        const hasDescription = session.description.trim() !== "";
+        const descId = `session-desc-${i}`;
 
 
         /*
          * Presenter:
          *
          * The presenter's name itself becomes the link
-         * to their personal website.
+         * to their personal website. Explicitly labelled
+         * so it's clear who's presenting.
          */
         const presenterHtml = presenterUrl
 
@@ -228,6 +227,10 @@ function render(rows) {
             : `
                 <span class="presenter">${escapeHtml(session.presenter)}</span>
               `;
+
+        const metaHtml = session.presenter
+            ? `<p class="meta"><span class="meta-label">Presented by</span> ${presenterHtml}</p>`
+            : `<p class="meta"></p>`;
 
 
         /*
@@ -250,16 +253,39 @@ function render(rows) {
             : `<span class="slides unavailable">—</span>`;
 
 
+        /*
+         * Topic:
+         *
+         * If a description exists, the topic becomes a
+         * clickable button that expands to reveal it.
+         * Otherwise it's just plain text.
+         */
+        const topicHtml = hasDescription
+            ? `
+                <button
+                    class="topic"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="${descId}"
+                >
+                    <span>${escapeHtml(session.topic || "Untitled session")}</span>
+                    <span class="chevron" aria-hidden="true">⌄</span>
+                </button>
+              `
+            : `<p class="topic">${escapeHtml(session.topic || "Untitled session")}</p>`;
+
+        const descriptionHtml = hasDescription
+            ? `<div class="description" id="${descId}" hidden>${escapeHtml(session.description)}</div>`
+            : "";
+
+
         return `
             <div class="session">
                 <time class="date">${escapeHtml(formatDate(session.date))}</time>
-
-                <div>
-                    <p class="topic">${escapeHtml(session.topic || "Untitled session")}</p>
-                    <p class="meta">${presenterHtml}</p>
-                </div>
-
+                ${topicHtml}
+                ${metaHtml}
                 ${slidesHtml}
+                ${descriptionHtml}
             </div>
         `;
 
@@ -269,6 +295,33 @@ function render(rows) {
     statusEl.textContent =
         `${sessions.length} session${sessions.length === 1 ? "" : "s"}`;
 }
+
+
+/* --------------------------------------------------
+   Expand / collapse topic descriptions
+-------------------------------------------------- */
+
+sessionsEl.addEventListener("click", (event) => {
+
+    const button = event.target.closest(".topic[aria-controls]");
+
+    if (!button) {
+        return;
+    }
+
+    const description = document.getElementById(
+        button.getAttribute("aria-controls")
+    );
+
+    if (!description) {
+        return;
+    }
+
+    const isExpanded = button.getAttribute("aria-expanded") === "true";
+
+    button.setAttribute("aria-expanded", String(!isExpanded));
+    description.hidden = isExpanded;
+});
 
 
 /* --------------------------------------------------
